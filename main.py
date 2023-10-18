@@ -27,17 +27,28 @@ def main():
     
     bg = pygame.image.load('backg.png')
     bg = pygame.transform.scale(bg, (400, 300))
+    car_left = pygame.image.load('Player_left.png')
+    car_left = pygame.transform.scale(car_left, (100, 100))
+    car_right = pygame.image.load('Player_Right.png')
+    car_right = pygame.transform.scale(car_right, (100, 100))
     while run:
         clock.tick(FPS)
+        keys = pygame.key.get_pressed()
+        if len(keys) > 0:
+            print(keys)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
             
         tileBackground(win, bg)
+        win.blit(car_left, (220, 500))
+        win.blit(car_right, (620, 500))
         pygame.display.update()
     pygame.quit()
     quit()
 
 if __name__ == "__main__":
     main()
+    
+# 70, 220 and 470, 620
