@@ -1,15 +1,19 @@
 import pygame
 import math
 import random
+
 pygame.init()
+
 WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brick Breaker")
+
 FPS = 60
 VEL = 7
 SCORE = 0
-MAX_VEL = 15
+MAX_VEL = 13
 obstacles = []
+
 def tile_background(screen: pygame.display, image: pygame.Surface) -> None:
     screen_width, screen_height = screen.get_size()
     image_width, image_height = image.get_size()
@@ -20,10 +24,10 @@ def tile_background(screen: pygame.display, image: pygame.Surface) -> None:
     for x in range(tiles_x):
         for y in range(tiles_y):
             screen.blit(image, (x * image_width, y * image_height))
+            
 def render_obj(img, x, y):
     global win
     win.blit(img, (x,y))
-    
 
 def spawn():
     im = pygame.image.load('Police.png')
@@ -66,11 +70,15 @@ def main():
     car_right_lane = False
     
     #obstacle spawwnig
-    min_time = 180
+    min_time = 60
     max_time = 300
     random_left = random.randint(min_time,max_time)
     random_right = random.randint(min_time,max_time)
     frames = 0
+    
+    #adding background music
+    bgmusic = pygame.mixer.Sound('bgmusic.mp3')
+    pygame.mixer.Sound.play(bgmusic, -1)
     
     #main loop
     run = True
@@ -82,17 +90,17 @@ def main():
         
         #spawn obstacle randomized
         frames+=1
-        if frames%random_left == 0:
+        if frames == random_left:
             spawn_obstacle_left()
-            random_left = random.randint(min_time,max_time)
-        if frames%random_right == 0:
+            random_left = frames + random.randint(min_time,max_time)
+        if frames == random_right:
             spawn_obstacle_right()
-            random_right = random.randint(min_time,max_time)
-        if frames%600 == 0 and VEL < MAX_VEL:
+            random_right = frames + random.randint(min_time,max_time)
+        if frames%200 == 0 and VEL < MAX_VEL:
             if VEL < MAX_VEL:
                 VEL+=1
             if max_time > min_time:
-                max_time-=5
+                max_time-=10
             
         #listening for events
         for event in pygame.event.get():
@@ -135,5 +143,6 @@ def main():
         pygame.display.update()
     pygame.quit()
     quit()
+    
 if __name__ == "__main__":
     main()
