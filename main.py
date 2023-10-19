@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 pygame.init()
 
@@ -7,6 +8,8 @@ WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brick Breaker")
 FPS = 60
+VEL = 10
+obstacles = []
 
 def tileBackground(screen: pygame.display, image: pygame.Surface) -> None:
     screenWidth, screenHeight = screen.get_size()
@@ -21,8 +24,16 @@ def tileBackground(screen: pygame.display, image: pygame.Surface) -> None:
         for y in range(tilesY):
             screen.blit(image, (x * imageWidth, y * imageHeight))
             
-def render_obj(img, x, y, win):
+def render_obj(img, x, y):
+    global win
     win.blit(img, (x,y))
+    
+def spawn_obstacle():
+    im = pygame.image.load('Police.png')
+    im = pygame.transform.scale(im, (100,100))
+    pos = random.randint(0,3)
+    xs = [70, 220, 470, 620]
+    obstacles.append([im,xs[pos],0])
 
 def main():
     clock = pygame.time.Clock()
@@ -36,10 +47,14 @@ def main():
     car_right = pygame.transform.scale(car_right, (100, 100))
     car_left_lane = False #False means left, True means right
     car_right_lane = False
+    frames = 0
+    
     while run:
         clock.tick(FPS)
-        keys = pygame.key.get_pressed()
-                
+        frames+=1
+        
+        if frames%60 == 0:
+            spawn_obstacle()
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -50,18 +65,25 @@ def main():
                     car_left_lane = not car_left_lane
                 if event.key == pygame.K_RSHIFT:
                     car_right_lane=not car_right_lane
+                    
         tileBackground(win, bg)
+        
         if car_left_lane:
             x_left = 70
         else:
             x_left = 220
+
         if car_right_lane:
             x_right = 470
         else:
             x_right = 620
             
-        render_obj(car_right, x_right,500,win)
-        render_obj(car_left,x_left,500,win)
+        render_obj(car_right, x_right,500)
+        render_obj(car_left,x_left,500)
+        
+        for obstacle in obstacles:
+            obstacle[2]+=VEL
+            render_obj(obstacle[0], obstacle[1], obstacle[2])
         
         pygame.display.update()
     pygame.quit()
