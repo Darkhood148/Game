@@ -7,6 +7,7 @@ win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brick Breaker")
 FPS = 60
 VEL = 7
+SCORE = 0
 MAX_VEL = 15
 obstacles = []
 def tile_background(screen: pygame.display, image: pygame.Surface) -> None:
@@ -43,6 +44,13 @@ def spawn_obstacle_right():
     
 def randomize():
     return random.randint(60,120)
+
+def display_text(text):
+    font = pygame.font.SysFont("comicsans", 40)
+    text_render = font.render(text, 1, "red")
+    win.blit(text_render, (WIDTH/2 - text_render.get_width() / 2, HEIGHT/2 - text_render.get_height()/2))
+    pygame.display.update()
+    pygame.time.delay(3000)
     
 def main():
     #Setting up the background
@@ -70,6 +78,7 @@ def main():
     while run:
         clock.tick(FPS)
         global VEL
+        global SCORE
         
         #spawn obstacle randomized
         frames+=1
@@ -85,7 +94,7 @@ def main():
             if max_time > min_time:
                 max_time-=5
             
-        
+        #listening for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -95,6 +104,8 @@ def main():
                     car_left_lane = not car_left_lane
                 if event.key == pygame.K_RSHIFT:
                     car_right_lane=not car_right_lane
+        
+        #displaying objects          
         tile_background(win, bg)
         if car_left_lane:
             x_left = 70
@@ -111,7 +122,16 @@ def main():
             render_obj(obstacle[0], obstacle[1], obstacle[2])
             if obstacle[2] >= HEIGHT:
                 obstacles.remove(obstacle)
+                SCORE += 10
+                
+            if obstacle[2] < 500 and obstacle[2] >= 400:
+                if obstacle[1] == x_left or obstacle[1] == x_right:
+                    display_text("Game Over!")
+                    run = False
             
+        highscore_text = pygame.font.SysFont("comicsans", 40).render(f"Score: {SCORE}", SCORE, "black")
+        win.blit(highscore_text, (10, HEIGHT - highscore_text.get_height() - 10))
+        
         pygame.display.update()
     pygame.quit()
     quit()
